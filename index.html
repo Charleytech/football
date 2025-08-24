@@ -1,0 +1,880 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aba Banker's League - Player Registration</title>
+    <!-- Using an external library to make the ID card downloadable -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <style>
+        /* --- Global Styles & Fonts --- */
+        @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700;900&display=swap');
+
+        :root {
+            --primary-color: #004d40; /* Dark Teal */
+            --secondary-color: #00796b; /* Lighter Teal */
+            --accent-color: #ffab40; /* Amber */
+            --text-color: #333;
+            --bg-color: #f4f4f4;
+            --card-bg: #ffffff;
+        }
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: auto;
+            padding: 20px;
+            overflow: hidden;
+        }
+
+        h1, h2, h3 {
+            color: var(--primary-color);
+            text-align: center;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 20px;
+        }
+
+        section {
+            background: var(--card-bg);
+            margin-bottom: 25px;
+            padding: 25px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+
+        /* --- Registration Form --- */
+        #registration-form {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-group label {
+            margin-bottom: 5px;
+            font-weight: 700;
+            color: var(--secondary-color);
+        }
+
+        .form-group input, .form-group select {
+            padding: 12px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 1rem;
+        }
+
+        .form-group input[type="file"] {
+            padding: 5px;
+        }
+        
+        #submit-btn {
+            grid-column: 1 / -1; /* Span across both columns */
+            padding: 15px;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 1.2rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        #submit-btn:hover {
+            background-color: var(--secondary-color);
+        }
+        
+        /* --- Modal for ID Card & Player List --- */
+        .modal {
+            display: none; /* Hidden by default */
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.7);
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background-color: #fefefe;
+            margin: auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 80%;
+            max-width: 500px;
+            border-radius: 10px;
+            position: relative;
+        }
+
+        .close-btn {
+            color: #aaa;
+            position: absolute;
+            top: 10px;
+            right: 25px;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        /* --- ID Card Design --- */
+        #id-card-design {
+            background: white;
+            color: rgb(92, 74, 14);
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+            text-align: center;
+        }
+
+        #id-card-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 2px solid var(--accent-color);
+            padding-bottom: 10px;
+            margin-bottom: 15px;
+        }
+
+        #id-card-header h3 {
+            color: white;
+            font-size: 1.2rem;
+            margin: 0;
+        }
+        
+        #id-card-logo {
+            width: 50px;
+            height: 50px;
+        }
+
+        #id-card-photo {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            border: 4px solid var(--accent-color);
+            object-fit: cover;
+            margin: 0 auto 15px auto;
+            display: block;
+        }
+        
+        #id-card-name {
+            font-size: 1.8rem;
+            font-weight: 900;
+            margin: 0;
+            color: var(--accent-color);
+        }
+        
+        #id-card-details p {
+            margin: 8px 0;
+            font-size: 1rem;
+        }
+
+        #id-card-id {
+            background: white;
+            color: green;
+            padding: 8px;
+            border-radius: 5px;
+            font-weight: 700;
+            font-size: 1.2rem;
+            margin-top: 15px;
+            display: inline-block;
+        }
+
+        #download-btn {
+            display: block;
+            width: 100%;
+            margin-top: 20px;
+            padding: 12px;
+            background-color: var(--accent-color);
+            color: var(--primary-color);
+            border: none;
+            border-radius: 5px;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        /* --- Founders Section --- */
+        .founders-grid {
+            display: flex;
+            justify-content: space-around;
+            text-align: center;
+            flex-wrap: wrap;
+        }
+        .founder {
+            margin: 15px;
+        }
+        .founder img {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 3px solid var(--secondary-color);
+        }
+        .founder p {
+            font-weight: 700;
+            margin-top: 10px;
+        }
+
+        /* --- Coordinators Section --- */
+        .coordinators-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+        .coordinator-card {
+            background: #e0f2f1; /* Light teal background */
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+            cursor: pointer;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        .coordinator-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+        }
+        .coordinator-card img {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            border: 3px solid var(--primary-color);
+        }
+        .coordinator-card h4 {
+            margin: 10px 0 5px 0;
+            color: var(--primary-color);
+        }
+        .player-list-summary table {
+            width: 100%;
+            text-align: left;
+            margin-top: 10px;
+            font-size: 0.9rem;
+        }
+        .player-list-summary th, .player-list-summary td {
+             padding: 5px;
+             border-bottom: 1px solid #b2dfdb;
+        }
+
+        /* --- Tables (Fixtures, Scoreboard, Player List Modal) --- */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            padding: 12px;
+            border: 1px solid #ddd;
+            text-align: center;
+        }
+        th {
+            background-color: var(--secondary-color);
+            color: white;
+            font-weight: 700;
+        }
+        tr:nth-child(even) {
+            background-color: #e0f2f1;
+        }
+
+        /* --- Live Scoreboard --- */
+        .scoreboard-container {
+            display: flex;
+            justify-content: space-around;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+        .scoreboard {
+            border: 2px solid var(--primary-color);
+            border-radius: 8px;
+            padding: 20px;
+            width: 45%;
+            min-width: 300px;
+            background: var(--card-bg);
+        }
+        .scoreboard-header {
+            text-align: center;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin-bottom: 15px;
+            border-bottom: 1px solid #ccc;
+            padding-bottom: 10px;
+        }
+        .match {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 1.2rem;
+        }
+        .team {
+            flex: 1;
+            text-align: center;
+        }
+        .score {
+            font-size: 2rem;
+            font-weight: 900;
+            color: var(--primary-color);
+            padding: 0 20px;
+        }
+        .live-indicator {
+            color: red;
+            font-weight: bold;
+            animation: blink 1.5s linear infinite;
+        }
+        @keyframes blink {
+            50% { opacity: 0; }
+        }
+
+        /* --- Rules Section --- */
+        #rules-content {
+            height: 2000px;
+            overflow-y: auto;
+            border: 1px solid #ccc;
+            padding: 15px;
+            background: #fafafa;
+            border-radius: 5px;
+            justify-items: center;
+            align-items: center;
+        }
+
+        /* --- Sponsors Section --- */
+        #sponsors-flex {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-around;
+            align-items: center;
+            gap: 20px;
+        }
+        .sponsor-item {
+            text-align: center;
+            flex-basis: 200px;
+        }
+        .sponsor-item img {
+            max-width: 150px;
+            height: auto;
+            margin-bottom: 10px;
+            filter: grayscale(100%);
+            transition: filter 0.3s;
+        }
+        .sponsor-item img:hover {
+            filter: grayscale(0%);
+        }
+        .sponsor-item p {
+            margin: 0;
+            font-size: 0.9rem;
+        }
+        .sponsor-item .name {
+            font-weight: 700;
+        }
+
+        /* --- Footer --- */
+        footer {
+            background-color: var(--primary-color);
+            color: white;
+            text-align: center;
+            padding: 20px;
+            margin-top: 30px;
+        }
+        footer p {
+            margin: 5px 0;
+        }
+        footer a {
+            color: var(--accent-color);
+            text-decoration: none;
+        }
+        .footer h4{
+            color: #10dbb9;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            #registration-form {
+                grid-template-columns: 1fr;
+            }
+            .scoreboard {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <header class="container">
+        <h1>Aba Banker's League Football Tournament 2025</h1>
+        <p style="text-align:center; margin-top:-20px;">Player Registration & Tournament Information Hub</p>
+    </header>
+
+    <main class="container">
+        
+        <!-- Founders Section -->
+        <section id="founders">
+            <h2>Our Founders</h2>
+            <div class="founders-grid">
+                <div class="founder">
+                    <img src="images/charley.jpg" alt="Founder 1">
+                    <p>Mr. Charles Asoluka</p>
+                    <p>Founder</p>
+                </div>
+                <div class="founder">
+                    <img src="images/ikedi.jpg" alt="Founder 2">
+                    <p>Mr. George Ezekiel</p>
+                    <p>CO Founder</p>
+                </div>
+                <div class="founder">
+                    <img src="https://via.placeholder.com/150/004d40/FFFFFF?text=Founder+3" alt="Founder 3">
+                    <p>Mr. Mike Ogunewe</p>
+                    <p>Patron</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Registration Form Section -->
+        <section id="registration">
+            <h2>Player Registration Form</h2>
+            <form id="registration-form">
+                <div class="form-group">
+                    <label for="full-name">Full Names</label>
+                    <input type="text" id="full-name" name="fullName" required>
+                </div>
+                <div class="form-group">
+                    <label for="phone-number">Phone Number</label>
+                    <input type="tel" id="phone-number" name="phoneNumber" required>
+                </div>
+                <div class="form-group">
+                    <label for="bank-name">Select Your Bank</label>
+                    <select id="bank-name" name="bankName" required>
+                        <option value="">-- Please Select --</option>
+                        <option value="UBA">United Bank for Africa (UBA)</option>
+                        <option value="FIDELITY">Fidelity Bank</option>
+                        <option value="ZENITH">Zenith Bank</option>
+                        <option value="ACCESS">Access Bank</option>
+                        <option value="FIRST">First Bank</option>
+                        <option value="AB MICRO">AB Micro Finance</option>
+                        <option value="FCMB">First City Monument Bank (FCMB)</option>
+                        <option value="UNITY">Unity Bank</option>
+        
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="passport">Passport Photograph (Clear Background)</label>
+                    <input type="file" id="passport" name="passport" accept="image/*" required>
+                </div>
+                <button type="submit" id="submit-btn">Register & Generate ID Card</button>
+            </form>
+        </section>
+
+        <!-- Bank Coordinators Section -->
+        <section id="coordinators">
+            <h2>Bank Coordinators & Registered Players</h2>
+            <div class="coordinators-grid" id="coordinators-container">
+                <!-- Coordinator cards will be generated by JavaScript -->
+            </div>
+        </section>
+        
+        <!-- Tournament Fixtures -->
+        <section id="fixtures">
+            <h2>Tournament Fixtures (Round Robin - Match Days)</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Match</th>
+                        <th>Home Team</th>
+                        <th>Away Team</th>
+                        <th>Venue</th>
+                        <th>Date</th>
+                        <th>Time</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr><td>1</td><td>Team A</td><td>Team B</td><td>Immaculate Stadium</td><td>04-10-2025</td><td>4:00 PM</td></tr>
+                    <tr><td>2</td><td>Team C</td><td>Team D</td><td>Immaculate Stadium</td><td>04-10-2025</td><td>4:00 PM</td></tr>
+                    <tr><td>3</td><td>Team E</td><td>Team F</td><td>Immaculate Stadium</td><td>05-10-2025</td><td>4:00 PM</td></tr>
+                    <tr><td>4</td><td>Team G</td><td>Team H</td><td>Immaculate Stadium</td><td>05-10-2025</td><td>4:00 PM</td></tr>
+    
+                </tbody>
+            </table>
+        </section>
+        
+        <!-- Live Scoreboards -->
+        <section id="live-scores">
+            <h2>Live Scores</h2>
+            <div class="scoreboard-container">
+                <div class="scoreboard">
+                    <div class="scoreboard-header">Saturday, 6th October 2025 <span class="live-indicator">● LIVE</span></div>
+                    <div class="match">
+                        <div class="team">Team A</div>
+                        <div class="score">0 - 0</div>
+                        <div class="team">Team B</div>
+                    </div>
+                </div>
+                <div class="scoreboard">
+                    <div class="scoreboard-header">Sunday, 7th October 2025</div>
+                     <div class="match">
+                        <div class="team">Team c</div>
+                        <div class="score">0 - 0</div>
+                        <div class="team">Team D</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Tournament Rules -->
+        <section id="rules">
+            <h2>Tournament Rules & Regulations</h2>
+            <div id="rules-content">
+               <p><strong>
+                 TOURNAMENT RULES & REGULATIONS 
+8-Team Football Tournament (or League Format Based on Participation) 
+<h3> TOURNAMENT FORMAT </h3>
+<ul>
+<ol>A. Standard Format (8 Teams) </ol>
+<ol>• The tournament shall consist of 8 registered teams if available, divided into two groups  (Group A & Group B) of 4 teams each. </ol>
+<ol>• Each group plays in a single round-robin format (each team plays the other 3 in  their group once). </ol>
+<ol>• The top 2 teams from each group qualify for the semi-finals. </ol>
+<ol>• Semi-final winners meet in the final to determine the champion. B. Alternative Format (Less than 8 Teams) </ol>
+<ol>• If fewer than 8 teams register, the tournament will switch to a league format. • All teams will play against each other once (single round-robin). • Points will be awarded as follows: </ol>
+<ol>o Win: 3 points </ol>
+<ol>o Draw: 1 point </ol>
+<ol>o Loss: 0 points </ol>
+<ol>• The team with the highest points at the end of all matches will be declared the  winner. </ol>
+<ol>• In case of a tie-on points, tie-breaking rules will apply.</ol> <br><br>
+<ol>2. MATCH RULES </ol>
+<ol>• Match Duration: 2 halves of 45 minutes with a 15-minute halftime break. • Group & League Stage Draws: Allowed (1 point to each team). • Knockout Stage (Semi-final/Final): </ol>
+<ol>o If tied at full time, extra time of 10 minutes (5 per half) will be played. </ol>
+<ol>o If still tied, the match proceeds to a penalty shootout (best of 5, then  sudden death).</ol> <br><br>
+<ol>3. PLAYER REGISTRATION & ELIGIBILITY </ol>
+<ol>• Each team must register a maximum of 23 players and up to 3 officials (e.g.,  coach, medic). </ol>
+<ol>• A minimum of 7 players is required to start or continue a match. • Players must be registered before the tournament begins. </ol>
+<ol>• Players must present valid ID. </ol>
+<ol>• A player may only play for one team during the tournament. </ol> <br><br>
+<ol>4. SUBSTITUTIONS </ol>
+<ol>• Each team is allowed up to 5 substitutions per match. </ol> 
+<ol>• Substitutions must be made during a stoppage with referee permission. • Maximum 3 substitution windows per team, excluding halftime. </ol> <br><br>
+<ol>5. YELLOW & RED CARD RULES </ol>
+<ol>Yellow Cards </ol>
+<ol>• A player who receives 2 yellow cards in different matches is suspended for the  next match. </ol>
+<ol>• All yellow cards are reset after the group or league stage. </ol>
+<ol>• Fine for a yellow card is N500 </ol>
+<ol>Red Cards </ol>
+<ol>• A direct red card results in a minimum one-match suspension. • Further sanctions may apply depending on the offense. </ol>
+<ol>• A player with two red cards in the tournament is disqualified. </ol>
+<ol>• Fine for a red card is N1000 </ol><br><br>
+<ol>6. EQUIPMENT & KITS </ol>
+<ol>• All players must wear proper football kits with visible shirt numbers. </ol>
+<ol>• Teams must have both primary and alternate jerseys to avoid color clashes. • Shin guards are mandatory. </ol>
+<ol>• Only FIFA-standard footballs will be used. </ol><br><br>
+<ol>7. TIE-BREAKING RULES </ol>
+<ol>Applicable in both group and league formats when teams are level on points: </ol>
+<ol>1. Goal difference </ol>
+<ol>2. Goals scored </ol>
+<ol>3. Head-to-head result </ol>
+<ol>4. Fair play record (fewer yellow/red cards) </ol>
+<ol>5. Drawing of lots by the organizing committee </ol><br><br>
+<ol>8. DISCIPLINE & CONDUCT </ol>
+<ol>• Referees’ decisions are final. </ol>
+<ol>• Aggressive behaviour, threats, or misconduct may lead to player or team  disqualification. </ol>
+<ol>• All participants must show sportsmanship and respect. </ol><br><br>
+<ol>9. PROTESTS & APPEALS </ol>
+<ol>• Protests must be filed in writing within 30 minutes after a match. • A disciplinary panel will rule within 24 hours. </ol>
+<ol>• Protests referee decisions will not be entertained unless there is evidence of  misconduct. </ol><br><br>
+<ol>10. PUNCTUALITY </ol>
+<ol>• Teams must report 30 minutes before kick-off. </ol>
+<ol>• A team arriving more than 15 minutes late forfeits the match (3–0 loss). • If both teams are absent or late, both may face disqualification. </ol><br><br>
+<ol>11. AWARDS </ol>
+<ol>• Champion Trophy & Medals for winners and runner-up. • Optional awards: </ol>
+<ol>o Golden Boot – Top Scorer </ol>
+<ol>o Golden Glove – Best Goalkeeper </ol>
+<ol>o Most Valuable Player (MVP) </ol>
+<ol>o Fair Play Team Award </ul>
+               </strong></p>
+            </div>
+        </section>
+
+        <!-- Sponsors Section -->
+        <section id="sponsors">
+            <h2>Our Esteemed Sponsors</h2>
+            <div id="sponsors-flex">
+                <div class="sponsor-item">
+                  
+            </div>
+        </section>
+    </main>
+    
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <h3>Aba Footballers Association</h3>
+            <p><strong>Office Address:</strong> No.20 Aba-Owerri Road Aba, Abia State.</p>
+            <p><strong>Phone:</strong> <a href="tel:+2349068420849">09068420849</a> | <a href="tel:+2348063203390">08063203390</a></p>
+            <p><strong>Email:</strong> <a href="ababankersleague@gmail.com">ababankersleague@gmail.com</a></p>
+            <p><b>Powered by Charleytech Hub Aba</b></p>
+            <p>© 2025 Aba Banker's League Football Tournament. All Rights Reserved.</p>
+            <div>
+             <a href="https://www.facebook.com/share/192HYhWfbD/"><img src="images/facebook.jpg" alt="" style="width: 50px; height: 50px;"></a> 
+               <a href="https://chat.whatsapp.com/Gx2Nj4guQaz2y4DjnBiRvJ?mode=ac_t"><img src="images/whatsapp.webp" alt="" style="width: 50px; height: 50px;"></a> 
+            </div>
+        </div>
+    </footer>
+
+    <!-- ID Card Modal -->
+    <div id="id-card-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" id="close-id-modal">×</span>
+            <div id="id-card-design">
+                 <div id="id-card-header">
+                    <img id="id-card-logo" src="images/IMG-20250626-WA0031.jpg" alt="AFA Logo">
+                    <h3>Official Player ID</h3>
+                </div>
+                <img id="id-card-photo" src="https://via.placeholder.com/150" alt="Player Passport">
+                <h2 id="id-card-name">PLAYER FULL NAME</h2>
+                <div id="id-card-details">
+                    <p><strong>Bank:</strong> <span id="id-card-bank">BANK NAME</span></p>
+                    <p><strong>Phone:</strong> <span id="id-card-phone">PHONE NUMBER</span></p>
+                </div>
+                <div id="id-card-id">ID: <span id="id-card-number">BANK000</span></div>
+            </div>
+            <button id="download-btn">Download ID Card</button>
+        </div>
+    </div>
+    
+    <!-- Player List Modal -->
+    <div id="player-list-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" id="close-player-list-modal">×</span>
+            <h2 id="player-list-header">Registered Players for [Bank Name]</h2>
+            <div id="player-list-table-container"></div>
+        </div>
+    </div>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+
+        // --- DATA STORAGE ---
+        const banks = {
+            "UBA": { name: "United Bank for Africa (UBA)", coordinator: "No Coordinator Yet", img: "https://via.placeholder.com/100/333/FFF?text=JO" },
+            "FIDELITY": { name: "Fidelity Bank", coordinator: "No Name", img: "https://via.placeholder.com/100/555/FFF?text=AN" },
+            "ZENITH": { name: "Zenith Bank", coordinator: "No Coordinator Yet", img: "https://via.placeholder.com/100/777/FFF?text=TB" },
+            "ACCESS": { name: "Access Bank", coordinator: "No Coordinator Yet", img: "https://via.placeholder.com/100/999/FFF?text=FA" },
+            "FIRST": { name: "First Bank", coordinator: "No Coordinator Yet", img: "https://via.placeholder.com/100/AAA/FFF?text=MS" },
+            "AB MICRO": { name: "Abmicrofinancebank", coordinator: "Mr. Popoola Femi", img: "images/popoola.jpg" },
+            "FCMB": { name: "First City Monument Bank (FCMB)", coordinator: "Mr John Obinali", img: "images/obinali.jpg" },
+            "UNITY": { name: "Unity Bank", coordinator: "Mr Rabiu Toheeb", img: "images/TOHEeB.jpg" }
+        };
+
+        const MAX_PLAYERS_PER_BANK = 22;
+        let registeredPlayers = {};
+
+        // Initialize data structures
+        Object.keys(banks).forEach(bankCode => {
+            registeredPlayers[bankCode] = [];
+        });
+
+
+        // --- DOM ELEMENTS ---
+        const form = document.getElementById('registration-form');
+        const coordinatorsContainer = document.getElementById('coordinators-container');
+        
+        // Modals
+        const idCardModal = document.getElementById('id-card-modal');
+        const playerListModal = document.getElementById('player-list-modal');
+        const closeIdModal = document.getElementById('close-id-modal');
+        const closePlayerListModal = document.getElementById('close-player-list-modal');
+        const downloadBtn = document.getElementById('download-btn');
+        
+
+        // --- INITIALIZATION ---
+        function renderCoordinatorCards() {
+            coordinatorsContainer.innerHTML = ''; // Clear existing cards
+            Object.keys(banks).forEach(bankCode => {
+                const bankData = banks[bankCode];
+                const playerCount = registeredPlayers[bankCode].length;
+
+                const card = document.createElement('div');
+                card.className = 'coordinator-card';
+                card.dataset.bank = bankCode; // Store bank code for click event
+                
+                card.innerHTML = `
+                    <img src="${bankData.img}" alt="${bankData.coordinator}">
+                    <h4>${bankData.name}</h4>
+                    <p>Coordinator: <strong>${bankData.coordinator}</strong></p>
+                    <p>Registered Players: <strong id="count-${bankCode}">${playerCount} / ${MAX_PLAYERS_PER_BANK}</strong></p>
+                    <div class="player-list-summary">
+                        <table id="summary-table-${bankCode}">
+                            <thead><tr><th>Registered Players</th></tr></thead>
+                            <tbody><!-- Player names will be added here --></tbody>
+                        </table>
+                    </div>
+                `;
+                coordinatorsContainer.appendChild(card);
+                
+                // Add click listener to the card
+                card.addEventListener('click', () => showPlayerListModal(bankCode));
+            });
+        }
+
+        // --- FORM SUBMISSION LOGIC ---
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            // Get form values
+            const fullName = document.getElementById('full-name').value.trim();
+            const phoneNumber = document.getElementById('phone-number').value.trim();
+            const bankCode = document.getElementById('bank-name').value;
+            const passportFile = document.getElementById('passport').files[0];
+
+            // Validation
+            if (!fullName || !phoneNumber || !bankCode || !passportFile) {
+                alert('Please fill out all fields and upload a passport photograph.');
+                return;
+            }
+
+            if (registeredPlayers[bankCode].length >= MAX_PLAYERS_PER_BANK) {
+                alert(`Registration for ${banks[bankCode].name} is full. No more players can be added.`);
+                return;
+            }
+
+            // Process image and generate ID card
+            const reader = new FileReader();
+            reader.onload = function(event) {
+                const photoUrl = event.target.result;
+                
+                // Generate ID Number
+                const playerCount = registeredPlayers[bankCode].length + 1;
+                const playerNumber = String(playerCount).padStart(3, '0'); // e.g., 1 -> 001, 12 -> 012
+                const bankIdPart = bankCode.substring(0, 4).toUpperCase();
+                const idNumber = `${bankIdPart}${playerNumber}`;
+
+                // Create player object
+                const newPlayer = {
+                    name: fullName,
+                    phone: phoneNumber,
+                    bank: banks[bankCode].name,
+                    id: idNumber,
+                    photo: photoUrl
+                };
+
+                // Store player data
+                registeredPlayers[bankCode].push(newPlayer);
+
+                // Update UI
+                updateCoordinatorDisplay(bankCode, fullName);
+                showIdCard(newPlayer);
+                form.reset();
+            };
+            reader.readAsDataURL(passportFile);
+        });
+        
+        // --- UI UPDATE FUNCTIONS ---
+        function updateCoordinatorDisplay(bankCode, newPlayerName) {
+            // Update player count
+            const countElement = document.getElementById(`count-${bankCode}`);
+            countElement.textContent = `${registeredPlayers[bankCode].length} / ${MAX_PLAYERS_PER_BANK}`;
+
+            // Add player name to summary table
+            const summaryTableBody = document.querySelector(`#summary-table-${bankCode} tbody`);
+            const newRow = summaryTableBody.insertRow();
+            const cell = newRow.insertCell(0);
+            cell.textContent = newPlayerName;
+        }
+
+        function showIdCard(player) {
+            // Populate ID card modal
+            document.getElementById('id-card-photo').src = player.photo;
+            document.getElementById('id-card-name').textContent = player.name;
+            document.getElementById('id-card-bank').textContent = player.bank;
+            document.getElementById('id-card-phone').textContent = player.phone;
+            document.getElementById('id-card-number').textContent = player.id;
+            
+            // Show modal
+            idCardModal.style.display = 'flex';
+        }
+
+        function showPlayerListModal(bankCode) {
+            const playerList = registeredPlayers[bankCode];
+            const bankName = banks[bankCode].name;
+
+            document.getElementById('player-list-header').textContent = `Registered Players for ${bankName}`;
+            
+            const tableContainer = document.getElementById('player-list-table-container');
+            if (playerList.length === 0) {
+                tableContainer.innerHTML = '<p>No players have registered for this bank yet.</p>';
+            } else {
+                let tableHTML = `
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>S/N</th>
+                                <th>Player Name</th>
+                                <th>Phone Number</th>
+                                <th>Player ID</th>
+                                <th>Year 2025</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                `;
+                playerList.forEach((player, index) => {
+                    tableHTML += `
+                        <tr>
+                            <td>${index + 1}</td>
+                            <td>${player.name}</td>
+                            <td>${player.phone}</td>
+                            <td>${player.id}</td>
+                        </tr>
+                    `;
+                });
+                tableHTML += '</tbody></table>';
+                tableContainer.innerHTML = tableHTML;
+            }
+
+            playerListModal.style.display = 'flex';
+        }
+
+        // --- MODAL CONTROLS ---
+        closeIdModal.onclick = () => idCardModal.style.display = 'none';
+        closePlayerListModal.onclick = () => playerListModal.style.display = 'none';
+
+        window.onclick = function(event) {
+            if (event.target == idCardModal) {
+                idCardModal.style.display = 'none';
+            }
+            if (event.target == playerListModal) {
+                playerListModal.style.display = 'none';
+            }
+        }
+
+        // --- ID CARD DOWNLOAD LOGIC ---
+        downloadBtn.addEventListener('click', () => {
+            const idCardElement = document.getElementById('id-card-design');
+            const playerName = document.getElementById('id-card-name').textContent.replace(/\s+/g, '-');
+            
+            html2canvas(idCardElement, {
+                scale: 2 // Increase scale for better resolution
+            }).then(canvas => {
+                const link = document.createElement('a');
+                link.download = `Player-ID-${playerName}.png`;
+                link.href = canvas.toDataURL('image/png');
+                link.click();
+            });
+        });
+
+        // --- INITIAL RENDER ---
+        renderCoordinatorCards();
+    });
+    </script>
+
+</body>
+</html>
